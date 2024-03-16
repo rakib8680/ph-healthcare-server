@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
+// create admin into DB
 const createAdminIntoDB = async (data: any) => {
   // hash password
   const hashedPassword: string = await bcrypt.hash(data?.password, 12);
@@ -30,6 +31,14 @@ const createAdminIntoDB = async (data: any) => {
   return createdAdminData;
 };
 
+
+// get all admins from DB
+const getAllAdmins = async () =>{
+  const result = await prisma.admin.findMany();
+  return result;
+}
+
 export const userServices = {
   createAdminIntoDB,
+  getAllAdmins
 };
