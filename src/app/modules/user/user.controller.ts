@@ -19,17 +19,8 @@ const createAdmin: RequestHandler = async (req, res) => {
   }
 };
 
-// get all admins
-const getAllAdmins: RequestHandler = async (req, res) => {
-  const result = await userServices.getAllAdmins();
-  res.status(200).json({
-    success: true,
-    message: "All Admins fetched successfully!",
-    data: result,
-  });
-};
+
 
 export const userControllers = {
   createAdmin,
-  getAllAdmins,
 };
