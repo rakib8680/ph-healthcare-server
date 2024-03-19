@@ -7,7 +7,7 @@ import { adminFilterableFields } from "./admin.constant";
 const getAllAdmins: RequestHandler = async (req, res) => {
   try {
     const filters = pick(req.query, adminFilterableFields);
-    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"])
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
     const result = await adminServices.getAllAdmins(filters, options);
     res.status(200).json({
       success: true,
@@ -24,6 +24,28 @@ const getAllAdmins: RequestHandler = async (req, res) => {
   }
 };
 
+// get single admin
+const getSingleAdmin: RequestHandler = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const result = await adminServices.getSingleAdmin(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Admin fetched successfully!",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error!",
+      error: error.name,
+    });
+  }
+};
+
 export const adminControllers = {
   getAllAdmins,
+  getSingleAdmin,
 };
