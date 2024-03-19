@@ -74,6 +74,13 @@ const getSingleAdmin = async (id: string) => {
 
 // update admin data
 const updateAdmin = async (id: string, data: Partial<Admin>) => {
+  // check if the user exists
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
   const result = await prisma.admin.update({
     where: {
       id,

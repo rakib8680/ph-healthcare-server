@@ -45,13 +45,12 @@ const getSingleAdmin: RequestHandler = async (req, res) => {
   }
 };
 
-
-// update admin 
+// update admin
 const updateAdmin: RequestHandler = async (req, res) => {
   const id = req.params.id;
   const data = req.body;
   try {
-    const result = await adminServices.updateAdmin(id,data);
+    const result = await adminServices.updateAdmin(id, data);
 
     res.status(200).json({
       success: true,
@@ -61,14 +60,14 @@ const updateAdmin: RequestHandler = async (req, res) => {
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: "Server Error!",
-      error: error.name,
+      message: error.name || "update failed!",
+      error: error,
     });
   }
-}
+};
 
 export const adminControllers = {
   getAllAdmins,
   getSingleAdmin,
-  updateAdmin
+  updateAdmin,
 };
