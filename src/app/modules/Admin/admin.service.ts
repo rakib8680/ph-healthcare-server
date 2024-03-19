@@ -49,7 +49,16 @@ const getAllAdmins = async (params: any, options: any) => {
             createdAt: "desc",
           },
   });
-  return result;
+
+  const total = await prisma.admin.count({ where: whereConditions });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 export const adminServices = {
