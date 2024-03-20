@@ -34,6 +34,11 @@ const getAllAdmins = async (params: any, options: any) => {
     });
   }
 
+  // add a condition to filter out the soft deleted records
+  andConditions.push({
+    isDeleted: false,
+  });
+
   const whereConditions: Prisma.AdminWhereInput = { AND: andConditions };
 
   const result = await prisma.admin.findMany({
@@ -62,10 +67,11 @@ const getAllAdmins = async (params: any, options: any) => {
 };
 
 // get single admin by id
-const getSingleAdmin = async (id: string) => {
+const getSingleAdmin = async (id: string): Promise<Admin | null> => {
   const result = await prisma.admin.findUnique({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
@@ -73,11 +79,15 @@ const getSingleAdmin = async (id: string) => {
 };
 
 // update admin data
-const updateAdmin = async (id: string, data: Partial<Admin>) => {
+const updateAdmin = async (
+  id: string,
+  data: Partial<Admin>
+): Promise<Admin> => {
   // check if the user exists
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
@@ -92,7 +102,7 @@ const updateAdmin = async (id: string, data: Partial<Admin>) => {
 };
 
 // delete admin
-const deleteAdmin = async (id: string) => {
+const deleteAdmin = async (id: string): Promise<Admin | null> => {
   // Fetch the admin's email first
   const admin = await prisma.admin.findUniqueOrThrow({
     where: {
@@ -121,11 +131,12 @@ const deleteAdmin = async (id: string) => {
 };
 
 // soft delete
-const softDeleteAdmin = async (id: string) => {
+const softDeleteAdmin = async (id: string): Promise<Admin | null> => {
   // Fetch the admin's email first
   const admin = await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
