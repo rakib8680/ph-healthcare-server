@@ -23,4 +23,16 @@ app.use("/api/v1", router);
 // global error handler
 app.use(globalErrorHandler);
 
+// not found error
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.status(httpStatus.NOT_FOUND).json({
+    success: false,
+    message: "API not found!",
+    error: {
+      path: req.originalUrl,
+      message: "Requested API not found!",
+    },
+  });
+});
+
 export default app;
