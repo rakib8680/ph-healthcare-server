@@ -1,7 +1,10 @@
-import { RequestHandler } from "express";
+import { RequestHandler, Response } from "express";
 import { adminServices } from "./admin.service";
 import pick from "../../../shared/pick";
 import { adminFilterableFields } from "./admin.constant";
+import sendResponse from "../../../shared/sendResponse";
+
+
 
 // get all admins
 const getAllAdmins: RequestHandler = async (req, res) => {
@@ -9,7 +12,8 @@ const getAllAdmins: RequestHandler = async (req, res) => {
     const filters = pick(req.query, adminFilterableFields);
     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
     const result = await adminServices.getAllAdmins(filters, options);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "All Admins fetched successfully!",
       meta: result.meta,
@@ -31,7 +35,8 @@ const getSingleAdmin: RequestHandler = async (req, res) => {
   try {
     const result = await adminServices.getSingleAdmin(id);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Admin fetched successfully!",
       data: result,
@@ -52,7 +57,8 @@ const updateAdmin: RequestHandler = async (req, res) => {
   try {
     const result = await adminServices.updateAdmin(id, data);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "User Updated successfully!",
       data: result,
@@ -66,14 +72,14 @@ const updateAdmin: RequestHandler = async (req, res) => {
   }
 };
 
-
-// delete admin 
+// delete admin
 const deleteAdmin: RequestHandler = async (req, res) => {
   const id = req.params.id;
   try {
     const result = await adminServices.deleteAdmin(id);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "User Deleted successfully!",
       data: result,
@@ -85,14 +91,16 @@ const deleteAdmin: RequestHandler = async (req, res) => {
       error: error,
     });
   }
-}
-// delete admin 
+};
+
+// delete admin
 const softDeleteAdmin: RequestHandler = async (req, res) => {
   const id = req.params.id;
   try {
     const result = await adminServices.softDeleteAdmin(id);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "User Deleted successfully!",
       data: result,
@@ -104,14 +112,12 @@ const softDeleteAdmin: RequestHandler = async (req, res) => {
       error: error,
     });
   }
-}
-
-
+};
 
 export const adminControllers = {
   getAllAdmins,
   getSingleAdmin,
   updateAdmin,
   deleteAdmin,
-  softDeleteAdmin
+  softDeleteAdmin,
 };
