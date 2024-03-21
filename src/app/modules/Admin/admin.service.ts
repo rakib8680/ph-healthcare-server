@@ -2,9 +2,14 @@ import { Admin, Prisma, UserStatus } from "@prisma/client";
 import { adminSearchableFields } from "./admin.constant";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import prisma from "../../../shared/prisma";
+import { TAdminFilterRequest } from "./admin.interface";
+import { TPaginationOptions } from "../../interfaces/pagination";
 
 // get all admins from DB
-const getAllAdmins = async (params: any, options: any) => {
+const getAllAdmins = async (
+  params: TAdminFilterRequest,
+  options: TPaginationOptions
+) => {
   const { page, limit, skip } = calculatePagination(options);
 
   const { searchTerm, ...filterData } = params;
@@ -83,8 +88,6 @@ const updateAdmin = async (
   id: string,
   data: Partial<Admin>
 ): Promise<Admin> => {
-
-
   // check if the user exists
   await prisma.admin.findUniqueOrThrow({
     where: {
