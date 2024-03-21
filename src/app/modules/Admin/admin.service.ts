@@ -83,6 +83,8 @@ const updateAdmin = async (
   id: string,
   data: Partial<Admin>
 ): Promise<Admin> => {
+
+
   // check if the user exists
   await prisma.admin.findUniqueOrThrow({
     where: {

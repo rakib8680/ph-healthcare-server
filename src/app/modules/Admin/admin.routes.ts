@@ -1,19 +1,19 @@
-import express, { RequestHandler } from "express";
-import { userControllers } from "../user/user.controller";
+import express from "express";
 import { adminControllers } from "./admin.controller";
+import validateRequest from "../../middlewares/validateRequest";
+import { adminValidations } from "./admin.validate";
 
 const router = express.Router();
 
-const validateRequest: RequestHandler = (req, res, next) => {
-  console.log("validated", req.body);
-  next();
-};
-
-router.get("/all-admins", validateRequest, adminControllers.getAllAdmins);
+router.get("/", adminControllers.getAllAdmins);
 
 router.get("/:id", adminControllers.getSingleAdmin);
 
-router.patch("/:id", validateRequest, adminControllers.updateAdmin);
+router.patch(
+  "/:id",
+  validateRequest(adminValidations.updateAdminValidationSchema),
+  adminControllers.updateAdmin
+);
 
 router.delete("/soft/:id", adminControllers.softDeleteAdmin);
 
