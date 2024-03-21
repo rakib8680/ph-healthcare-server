@@ -1,22 +1,12 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
 import { adminServices } from "./admin.service";
 import pick from "../../../shared/pick";
 import { adminFilterableFields } from "./admin.constant";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
-
-const catchAsync = (fn: RequestHandler) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      await fn(req, res, next);
-    } catch (error) {
-      next(error);
-    }
-  };
-};
+import catchAsync from "../../../shared/catchAsync";
 
 // get all admins
-const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
+const getAllAdmins = catchAsync(async (req, res) => {
   const filters = pick(req.query, adminFilterableFields);
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
   const result = await adminServices.getAllAdmins(filters, options);
@@ -30,7 +20,7 @@ const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
 });
 
 // get single admin
-const getSingleAdmin: RequestHandler = catchAsync(async (req, res) => {
+const getSingleAdmin = catchAsync(async (req, res) => {
   const id = req.params.id;
 
   const result = await adminServices.getSingleAdmin(id);
@@ -44,7 +34,7 @@ const getSingleAdmin: RequestHandler = catchAsync(async (req, res) => {
 });
 
 // update admin
-const updateAdmin: RequestHandler = catchAsync(async (req, res) => {
+const updateAdmin = catchAsync(async (req, res) => {
   const id = req.params.id;
   const data = req.body;
   const result = await adminServices.updateAdmin(id, data);
@@ -58,7 +48,7 @@ const updateAdmin: RequestHandler = catchAsync(async (req, res) => {
 });
 
 // delete admin
-const deleteAdmin: RequestHandler = catchAsync(async (req, res) => {
+const deleteAdmin = catchAsync(async (req, res) => {
   const id = req.params.id;
   const result = await adminServices.deleteAdmin(id);
 
@@ -71,7 +61,7 @@ const deleteAdmin: RequestHandler = catchAsync(async (req, res) => {
 });
 
 // delete admin
-const softDeleteAdmin: RequestHandler = catchAsync(async (req, res) => {
+const softDeleteAdmin = catchAsync(async (req, res) => {
   const id = req.params.id;
   const result = await adminServices.softDeleteAdmin(id);
 
