@@ -1,6 +1,6 @@
+import { generateToken } from "../../../helpers/jwtHelpers";
 import prisma from "../../../shared/prisma";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
 const loginUser = async (payload: { email: string; password: string }) => {
   // check if user exists
@@ -16,9 +16,9 @@ const loginUser = async (payload: { email: string; password: string }) => {
     userData.password
   );
 
-    if (!isPasswordMatched) {
-        throw new Error("Invalid password");
-    }
+  if (!isPasswordMatched) {
+    throw new Error("Invalid password");
+  }
 
   //   jwt payload
   const jwtPayload = {
@@ -27,15 +27,10 @@ const loginUser = async (payload: { email: string; password: string }) => {
   };
 
   //   create access token
-  const accessToken = jwt.sign(jwtPayload, "secret", {
-    expiresIn: "5m",
-  });
+  const accessToken = generateToken(jwtPayload, "secret", "5m");
 
-  // create refresh token 
-  const refreshToken = jwt.sign(jwtPayload, "verySecret", {
-    expiresIn: "30d",
-  });
-
+  // create refresh token
+  const refreshToken = generateToken(jwtPayload, "verySecret", "30d");
 
   return {
     accessToken,
