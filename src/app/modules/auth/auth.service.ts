@@ -2,6 +2,7 @@ import { generateToken } from "../../../helpers/jwtHelpers";
 import prisma from "../../../shared/prisma";
 import bcrypt from "bcrypt";
 
+// Login User
 const loginUser = async (payload: { email: string; password: string }) => {
   // check if user exists
   const userData = await prisma.user.findUniqueOrThrow({
@@ -26,7 +27,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
     role: userData.role,
   };
 
-  //   create access token
+  // create access token
   const accessToken = generateToken(jwtPayload, "secret", "5m");
 
   // create refresh token
@@ -39,6 +40,11 @@ const loginUser = async (payload: { email: string; password: string }) => {
   };
 };
 
-export const authServices = {
+const refreshToken = async (token: string) => {
+  console.log("refresh token", token);
+};
+
+export const AuthServices = {
   loginUser,
+  refreshToken,
 };
