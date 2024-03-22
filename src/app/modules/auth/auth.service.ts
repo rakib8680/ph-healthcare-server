@@ -10,6 +10,16 @@ const loginUser = async (payload: { email: string; password: string }) => {
     },
   });
 
+  //   check if password is matched
+  const isPasswordMatched: boolean = await bcrypt.compare(
+    payload.password,
+    userData.password
+  );
+
+    if (!isPasswordMatched) {
+        throw new Error("Invalid password");
+    }
+
 
 
   return {
