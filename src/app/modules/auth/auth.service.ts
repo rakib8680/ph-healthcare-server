@@ -20,6 +20,21 @@ const loginUser = async (payload: { email: string; password: string }) => {
         throw new Error("Invalid password");
     }
 
+  //   jwt payload
+  const jwtPayload = {
+    email: userData.email,
+    role: userData.role,
+  };
+
+  //   create access token
+  const accessToken = jwt.sign(jwtPayload, "secret", {
+    expiresIn: "5m",
+  });
+
+  // create refresh token 
+  const refreshToken = jwt.sign(jwtPayload, "verySecret", {
+    expiresIn: "30d",
+  });
 
 
   return {
