@@ -33,7 +33,7 @@ const getAllAdmins = async (
     andConditions.push({
       AND: Object.keys(filterData).map((field) => ({
         [field]: {
-          equals: filterData[field],
+          equals: (filterData as any)[field],
         },
       })),
     });
