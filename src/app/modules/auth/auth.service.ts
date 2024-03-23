@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import config from "../../../config";
 import { Secret } from "jsonwebtoken";
 
+
+
 // Login User
 const loginUser = async (payload: { email: string; password: string }) => {
   // check if user exists
@@ -51,7 +53,6 @@ const loginUser = async (payload: { email: string; password: string }) => {
     needPasswordChange: userData.needPasswordChange,
   };
 };
-
 
 
 
