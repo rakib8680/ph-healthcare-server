@@ -11,4 +11,10 @@ router.post(
   userControllers.createAdmin
 );
 
+router.post(
+  "/create-admin",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  userControllers.createAdmin
+);
+
 export const userRoutes = router;

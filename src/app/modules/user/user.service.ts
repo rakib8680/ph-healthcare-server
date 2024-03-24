@@ -4,6 +4,7 @@ import prisma from "../../../shared/prisma";
 
 // create admin into DB
 const createAdminIntoDB = async (data: any) => {
+  
   // hash password
   const hashedPassword: string = await bcrypt.hash(data?.password, 12);
 

@@ -3,7 +3,9 @@ import { generateToken, verifyToken } from "../../../helpers/jwtHelpers";
 import prisma from "../../../shared/prisma";
 import bcrypt from "bcrypt";
 import config from "../../../config";
-import { Secret } from "jsonwebtoken";
+import { JwtPayload, Secret } from "jsonwebtoken";
+import ApiError from "../../errors/ApiError";
+import httpStatus from "http-status";
 
 
 
@@ -58,7 +60,6 @@ const loginUser = async (payload: { email: string; password: string }) => {
 
 // generate new access token using refresh token
 const refreshToken = async (token: string) => {
-
   // verify the token
   let decoded;
 
@@ -75,7 +76,6 @@ const refreshToken = async (token: string) => {
       status: UserStatus.ACTIVE,
     },
   });
-
 
   //   jwt payload
   const jwtPayload = {
@@ -98,7 +98,65 @@ const refreshToken = async (token: string) => {
 
 
 
+// change password
+const changePassword = async (
+  user: JwtPayload,
+  payload: { oldPassword: string; newPassword: string }
+) => {
+
+  // check if user exists
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+
+  // check if old password is correct
+  const isPasswordMatched: boolean = await bcrypt.compare(
+    payload.oldPassword,
+    userData.password
+  );
+
+  if (!isPasswordMatched) {
+    throw new Error("Current Password does not match");
+  };
+
+
+  // check if the new password is same as the old password
+  if (payload.oldPassword === payload.newPassword) {
+    throw new ApiError(httpStatus.NOT_ACCEPTABLE,"New password can not be same as old password");
+  };
+
+
+  // hash the new password
+  const hashedPassword: string = await bcrypt.hash(payload.newPassword, 12);
+
+  // update the password
+  await prisma.user.update({
+    where: {
+      email:user.email
+    },
+    data:{
+      password: hashedPassword,
+      needPasswordChange: false
+    }
+  });
+
+
+  return {
+    message: "Password changed successfully",
+  }
+
+
+};
+
+
+
+
 export const AuthServices = {
   loginUser,
   refreshToken,
+  changePassword,
 };

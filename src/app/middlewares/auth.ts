@@ -19,6 +19,10 @@ const auth = (...roles: string[]) => {
       throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
     }
 
+    // set the user in request object
+    req.user = decodedData;
+    // console.log(decodedData);
+
     next();
   });
 };

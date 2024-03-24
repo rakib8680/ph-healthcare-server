@@ -3,6 +3,7 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { AuthServices } from "./auth.service";
 
+// Login User
 const loginUser = catchAsync(async (req, res) => {
   const payload = req.body;
   const result = await AuthServices.loginUser(payload);
@@ -25,9 +26,8 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
-
+// generate new access token using refresh token
 const refreshToken = catchAsync(async (req, res) => {
-
   const { refreshToken } = req.cookies;
 
   const result = await AuthServices.refreshToken(refreshToken);
@@ -35,13 +35,28 @@ const refreshToken = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "User logged in successfully",
-    data:result
+    message: "Access token generated successfully",
+    data: result,
   });
+});
 
-})
+// change password
+const changePassword = catchAsync(async (req, res) => {
+  const user = req.user;
+  const payload = req.body;
+
+  const result = await AuthServices.changePassword(user, payload);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Password changed successfully",
+    data: result,
+  });
+});
 
 export const AuthController = {
   loginUser,
-  refreshToken
+  refreshToken,
+  changePassword,
 };
