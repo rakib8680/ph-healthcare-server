@@ -6,6 +6,7 @@ import config from "../../../config";
 import { JwtPayload, Secret } from "jsonwebtoken";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
+import { sendMail } from "./emailSender";
 
 
 
@@ -97,13 +98,11 @@ const refreshToken = async (token: string) => {
 
 
 
-
 // change password
 const changePassword = async (
   user: JwtPayload,
   payload: { oldPassword: string; newPassword: string }
 ) => {
-
   // check if user exists
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
@@ -111,7 +110,6 @@ const changePassword = async (
       status: UserStatus.ACTIVE,
     },
   });
-
 
   // check if old password is correct
   const isPasswordMatched: boolean = await bcrypt.compare(
@@ -121,14 +119,15 @@ const changePassword = async (
 
   if (!isPasswordMatched) {
     throw new Error("Current Password does not match");
-  };
-
+  }
 
   // check if the new password is same as the old password
   if (payload.oldPassword === payload.newPassword) {
-    throw new ApiError(httpStatus.NOT_ACCEPTABLE,"New password can not be same as old password");
-  };
-
+    throw new ApiError(
+      httpStatus.NOT_ACCEPTABLE,
+      "New password can not be same as old password"
+    );
+  }
 
   // hash the new password
   const hashedPassword: string = await bcrypt.hash(payload.newPassword, 12);
@@ -136,27 +135,62 @@ const changePassword = async (
   // update the password
   await prisma.user.update({
     where: {
-      email:user.email
+      email: user.email,
     },
-    data:{
+    data: {
       password: hashedPassword,
-      needPasswordChange: false
-    }
+      needPasswordChange: false,
+    },
   });
-
 
   return {
     message: "Password changed successfully",
-  }
-
-
+  };
 };
 
 
 
+// start here 
+
+// forgot password
+const forgotPassword = async (payload: { email: string }) => {
+  // check if user exists
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: payload.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  // create a reset password token
+  const jwtPayload = {
+    email: userData.email,
+    role: userData.role,
+  };
+  const resetPasswordToken = generateToken(
+    jwtPayload,
+    config.resetPasswordSecret as Secret,
+    config.resetTokenExp as string
+  );
+
+
+  // http://localhost:3000/reset-password?email=admin1@gmail.com&token=asdf
+
+  // create a reset password link
+  const resetPasswordLink = config.resetPasswordLink + `?email=${userData.email}&token=${resetPasswordToken}`
+
+
+  // send email
+
+  return{
+    message: "Reset password link has been sent to your email"
+  }
+
+};
 
 export const AuthServices = {
   loginUser,
   refreshToken,
   changePassword,
+  forgotPassword,
 };

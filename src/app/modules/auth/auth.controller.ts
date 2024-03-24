@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { AuthServices } from "./auth.service";
+import { Request } from "express";
 
 // Login User
 const loginUser = catchAsync(async (req, res) => {
@@ -41,16 +42,31 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 // change password
-const changePassword = catchAsync(async (req, res) => {
-  const user = req.user;
-  const payload = req.body;
+const changePassword = catchAsync(
+  async (req: Request & { user?: any }, res) => {
+    const user = req.user;
+    const payload = req.body;
 
-  const result = await AuthServices.changePassword(user, payload);
+    const result = await AuthServices.changePassword(user, payload);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password changed successfully",
+      data: result,
+    });
+  }
+);
+
+// forgot password
+const forgotPassword = catchAsync(async (req, res) => {
+
+  const result = await AuthServices.forgotPassword(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Password changed successfully",
+    message: "",
     data: result,
   });
 });
@@ -59,4 +75,5 @@ export const AuthController = {
   loginUser,
   refreshToken,
   changePassword,
+  forgotPassword,
 };
