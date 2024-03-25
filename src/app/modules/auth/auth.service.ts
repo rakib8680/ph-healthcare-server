@@ -150,7 +150,6 @@ const changePassword = async (
 
 
 
-
 // forgot password
 const forgotPassword = async (payload: { email: string }) => {
   // check if user exists
@@ -172,15 +171,17 @@ const forgotPassword = async (payload: { email: string }) => {
     config.resetTokenExp as string
   );
 
-
   // http://localhost:3000/reset-password?email=admin1@gmail.com&token=asdf
 
   // create a reset password link
-  const resetPasswordLink = config.resetPasswordLink + `?email=${userData.email}&token=${resetPasswordToken}`
-
+  const resetPasswordLink =
+    config.resetPasswordLink +
+    `?email=${userData.email}&token=${resetPasswordToken}`;
 
   // send email
-  await sendMail(userData.email, `
+  await sendMail(
+    userData.email,
+    `
   <!DOCTYPE html>
   <html>
   <head>
@@ -253,17 +254,67 @@ const forgotPassword = async (payload: { email: string }) => {
       </div>
     </div>
   </body>
-  </html>`);
+  </html>`
+  );
 
-  return{
-    message: "Reset password link has been sent to your email"
+  return {
+    message: "Reset password link has been sent to your email",
+  };
+};
+
+
+// reset password
+const resetPassword = async (
+  token: string,
+  payload: { email: string; password: string }
+) => {
+  // check if user exists
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: payload.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  // verify the token
+  const decoded = verifyToken(token, config.resetPasswordSecret as Secret);
+  if (!decoded) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized Access");
   }
 
+  // check if the new password is same as the old password
+  const isPasswordMatched: boolean = await bcrypt.compare(
+    payload.password,
+    userData.password
+  );
+  if (isPasswordMatched) {
+    throw new Error("New password can not be same as old password");
+  }
+
+  // hash the new password
+  const hashedPassword: string = await bcrypt.hash(payload.password, 12);
+
+  // update the password into database
+  await prisma.user.update({
+    where: {
+      email: userData.email,
+    },
+    data: {
+      password: hashedPassword,
+    },
+  });
+
+  return {
+    message: "Password reset successfully",
+  };
 };
+
+
 
 export const AuthServices = {
   loginUser,
   refreshToken,
   changePassword,
   forgotPassword,
+  resetPassword,
 };
