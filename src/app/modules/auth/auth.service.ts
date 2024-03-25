@@ -150,7 +150,6 @@ const changePassword = async (
 
 
 
-// start here 
 
 // forgot password
 const forgotPassword = async (payload: { email: string }) => {
@@ -181,6 +180,80 @@ const forgotPassword = async (payload: { email: string }) => {
 
 
   // send email
+  await sendMail(userData.email, `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Reset Password</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .email-container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+      }
+      .email-header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #ddd;
+      }
+      .email-content {
+        margin-top: 20px;
+        line-height: 1.5;
+        color: #666;
+      }
+      .reset-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        color: #333;
+        background-color: #ffffff;
+        text-decoration: none;
+        border: 1px solid #333;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .reset-link:hover {
+        background-color: #f3f3f3;
+      }
+      .email-footer {
+        text-align: center;
+        padding: 20px 0;
+        border-top: 1px solid #ddd;
+        color: #888;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <h2>Hello,</h2>
+      </div>
+      <p class="email-content">
+        We received a request to reset your password. Click the button below to reset it.
+      </p>
+      <a href="${resetPasswordLink}" class="reset-link">Reset Password</a>
+      <p class="email-content">
+        If you did not request this, please ignore this email.
+      </p>
+      <div class="email-footer">
+        <p>If you have any questions, please contact our support team.</p>
+      </div>
+    </div>
+  </body>
+  </html>`);
 
   return{
     message: "Reset password link has been sent to your email"
