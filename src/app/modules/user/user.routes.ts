@@ -2,9 +2,15 @@ import express from "express";
 import { userControllers } from "./user.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
-import upload from "../../../helpers/fileUploader";
+import { upload } from "../../../helpers/fileUploader";
 
 const router = express.Router();
+
+
+
+
+
+
 
 router.post(
   "/create-admin",

@@ -3,32 +3,36 @@ import bcrypt from "bcrypt";
 import prisma from "../../../shared/prisma";
 
 // create admin into DB
-const createAdminIntoDB = async (data: any) => {
+const createAdminIntoDB = async (req: any) => {
+  
+  
+  console.log(req.file);
+  console.log(req.body.data);
   
   // hash password
-  const hashedPassword: string = await bcrypt.hash(data?.password, 12);
+  // const hashedPassword: string = await bcrypt.hash(data?.password, 12);
 
-  const userData = {
-    email: data?.admin.email,
-    password: hashedPassword,
-    role: UserRole.ADMIN,
-  };
+  // const userData = {
+  //   email: data?.admin.email,
+  //   password: hashedPassword,
+  //   role: UserRole.ADMIN,
+  // };
 
-  const createUser = prisma.user.create({
-    data: userData,
-  });
-  const createAdmin = prisma.admin.create({
-    data: data?.admin,
-  });
+  // const createUser = prisma.user.create({
+  //   data: userData,
+  // });
+  // const createAdmin = prisma.admin.create({
+  //   data: data?.admin,
+  // });
 
   // batch transaction
-  const [createdUserData, createdAdminData] = await prisma.$transaction([
-    createUser,
-    createAdmin,
-  ]);
+  // const [createdUserData, createdAdminData] = await prisma.$transaction([
+  //   createUser,
+  //   createAdmin,
+  // ]);
   // console.log(createdAdminData);
 
-  return createdAdminData;
+  // return createdAdminData;
 };
 
 export const userServices = {
