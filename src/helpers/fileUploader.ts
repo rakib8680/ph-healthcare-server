@@ -1,6 +1,7 @@
 import multer from "multer";
-import path, { resolve } from "path";
+import path from "path";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 cloudinary.config({
   cloud_name: "dy6sgpkql",
@@ -25,11 +26,20 @@ const storage = multer.diskStorage({
 
 // upload file in cloudinary
 export const uploadToCloudinary = async (file: any) => {
+
   return new Promise((resolve, reject) => {
+
     cloudinary.uploader.upload(
       `E:/Work FIles/PH-HEALTHCARE-SERVER/uploads/${file.originalname}`,
+
       { public_id: file.originalname },
+
       (error, result) => {
+        // delete file from local storage
+        fs.unlinkSync(
+          `E:/Work FIles/PH-HEALTHCARE-SERVER/uploads/${file.originalname}`
+        );
+
         if (error) {
           reject(error);
         } else {
