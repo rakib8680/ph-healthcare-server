@@ -1,11 +1,11 @@
 import multer from "multer";
-import path from "path";
-import {v2 as cloudinary} from 'cloudinary';
-          
-cloudinary.config({ 
-  cloud_name: 'dy6sgpkql', 
-  api_key: '357623463728155', 
-  api_secret: 'kVHm3ajDRFO2f52xQmldafGKoh4' 
+import path, { resolve } from "path";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: "dy6sgpkql",
+  api_key: "357623463728155",
+  api_secret: "kVHm3ajDRFO2f52xQmldafGKoh4",
 });
 
 
@@ -24,16 +24,20 @@ const storage = multer.diskStorage({
 
 
 // upload file in cloudinary
-export const uploadToCloudinary = async(file:any)=>{
- await cloudinary.uploader.upload("E:/Work FIles/PH-HEALTHCARE-SERVER/uploads/rakib8680.png",
-  { public_id: "olympic_flag" }, 
-  function(error, result) {console.log(result); });
-}
-
-
-
+export const uploadToCloudinary = async (file: any) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload(
+      `E:/Work FIles/PH-HEALTHCARE-SERVER/uploads/${file.originalname}`,
+      { public_id: file.originalname },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+};
 
 export const upload = multer({ storage: storage });
-
-
-

@@ -16,6 +16,7 @@ router.post(
   "/create-admin",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   upload.single("file"),
+  
   userControllers.createAdmin
 );
 
