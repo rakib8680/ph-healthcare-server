@@ -23,17 +23,18 @@ const storage = multer.diskStorage({
 });
 
 
-
-
 // upload file in cloudinary
 export const uploadToCloudinary = async (
   file: TFile
 ): Promise<TCloudinaryResponse> => {
+
+
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(
       `E:/Work FIles/PH-HEALTHCARE-SERVER/uploads/${file.originalname}`,
 
       (error, result: TCloudinaryResponse) => {
+        
         // delete file from local storage
         fs.unlinkSync(
           `E:/Work FIles/PH-HEALTHCARE-SERVER/uploads/${file.originalname}`
@@ -48,5 +49,7 @@ export const uploadToCloudinary = async (
     );
   });
 };
+
+
 
 export const upload = multer({ storage: storage });
