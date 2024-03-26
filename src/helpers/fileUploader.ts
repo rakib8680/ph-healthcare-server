@@ -2,7 +2,7 @@ import multer from "multer";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import { TCloudinaryResponse } from "../app/interfaces/file";
+import { TCloudinaryResponse, TFile } from "../app/interfaces/file";
 
 cloudinary.config({
   cloud_name: "dy6sgpkql",
@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
 // upload file in cloudinary
 export const uploadToCloudinary = async (
-  file: any
+  file: TFile
 ): Promise<TCloudinaryResponse> => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(
