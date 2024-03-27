@@ -36,6 +36,20 @@ router.post(
 
 
 
+// create patient 
+router.post(
+  "/create-patient",
+  upload.single("file"),
+  (req:Request, res:Response, next:NextFunction)=>{
+
+    req.body = userValidations.createPatientSchema.parse(JSON.parse(req.body.data))
+
+   return userControllers.createPatient(req, res, next)
+  }
+);
+
+
+
 
 
 
