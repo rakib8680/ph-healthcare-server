@@ -1,8 +1,11 @@
-import { UserRole } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import bcrypt from "bcrypt";
 import prisma from "../../../shared/prisma";
 import { uploadToCloudinary } from "../../../helpers/fileUploader";
 import { TFile } from "../../interfaces/file";
+import { TPaginationOptions } from "../../interfaces/pagination";
+import { calculatePagination } from "../../../helpers/paginationHelper";
+import { userSearchableFields } from "./user.constants";
 
 
 
@@ -84,6 +87,7 @@ const createDoctorIntoDB = async (req: any) => {
 
 // create patient into DB
 const createPatientIntoDB = async (req: any) => {
+  
   // upload photo in cloudinary
   const file: TFile = req.file;
   if (file) {
@@ -121,8 +125,74 @@ const createPatientIntoDB = async (req: any) => {
 
 
 
+// get all users from DB
+const getAllUsers = async (
+  params: any,
+  options: TPaginationOptions
+) => {
+  const { page, limit, skip } = calculatePagination(options);
+
+  const { searchTerm, ...filterData } = params;
+
+  const andConditions: Prisma.UserWhereInput[] = [];
+
+  // searching
+  if (params.searchTerm) {
+    andConditions.push({
+      OR: userSearchableFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  // filtering
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((field) => ({
+        [field]: {
+          equals: (filterData as any)[field],
+        },
+      })),
+    });
+  };
+  
+
+  const whereConditions: Prisma.UserWhereInput = andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+
+  const total = await prisma.user.count({ where: whereConditions });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+
+
 export const userServices = {
   createAdminIntoDB,
   createDoctorIntoDB,
   createPatientIntoDB,
+  getAllUsers,
+
 };

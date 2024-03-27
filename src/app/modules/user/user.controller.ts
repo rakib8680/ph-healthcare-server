@@ -1,5 +1,10 @@
 import { userServices } from "./user.service";
 import catchAsync from "../../../shared/catchAsync";
+import { userFilterableFields } from "./user.constants";
+import pick from "../../../shared/pick";
+import sendResponse from "../../../shared/sendResponse";
+import httpStatus from "http-status";
+
 
 
 
@@ -39,8 +44,26 @@ const createPatient = catchAsync(async (req, res) => {
 
 
 
+// get all Users
+const getAllUsers = catchAsync(async (req, res) => {
+  const filters = pick(req.query, userFilterableFields);
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const result = await userServices.getAllUsers(filters, options);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All Users fetched successfully!",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+
+
+
 export const userControllers = {
   createAdmin,
   createDoctor,
   createPatient,
+  getAllUsers,
 };
