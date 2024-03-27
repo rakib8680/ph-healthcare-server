@@ -30,7 +30,7 @@ router.post(
 
     req.body = userValidations.createDoctorSchema.parse(JSON.parse(req.body.data))
 
-   return userControllers.createAdmin(req, res, next)
+   return userControllers.createDoctor(req, res, next)
   }
 );
 
