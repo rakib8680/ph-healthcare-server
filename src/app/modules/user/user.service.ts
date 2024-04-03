@@ -87,7 +87,6 @@ const createDoctorIntoDB = async (req: any) => {
 
 // create patient into DB
 const createPatientIntoDB = async (req: any) => {
-  
   // upload photo in cloudinary
   const file: TFile = req.file;
   if (file) {
@@ -126,10 +125,7 @@ const createPatientIntoDB = async (req: any) => {
 
 
 // get all users from DB
-const getAllUsers = async (
-  params: any,
-  options: TPaginationOptions
-) => {
+const getAllUsers = async (params: any, options: TPaginationOptions) => {
   const { page, limit, skip } = calculatePagination(options);
 
   const { searchTerm, ...filterData } = params;
@@ -157,10 +153,10 @@ const getAllUsers = async (
         },
       })),
     });
-  };
-  
+  }
 
-  const whereConditions: Prisma.UserWhereInput = andConditions.length > 0 ? { AND: andConditions } : {};
+  const whereConditions: Prisma.UserWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.user.findMany({
     where: whereConditions,
@@ -174,6 +170,15 @@ const getAllUsers = async (
         : {
             createdAt: "desc",
           },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      needPasswordChange: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
 
   const total = await prisma.user.count({ where: whereConditions });
@@ -188,11 +193,30 @@ const getAllUsers = async (
 };
 
 
+// update user status 
+const changeProfileStatus = async (id: string, status: UserRole) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+      where: {
+          id
+      }
+  });
+
+  const updateUserStatus = await prisma.user.update({
+      where: {
+          id
+      },
+      data: status
+  });
+
+  return updateUserStatus;
+};
+
+
 
 export const userServices = {
   createAdminIntoDB,
   createDoctorIntoDB,
   createPatientIntoDB,
   getAllUsers,
-
+  changeProfileStatus
 };

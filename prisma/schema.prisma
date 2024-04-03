@@ -19,7 +19,7 @@ model User {
   updatedAt          DateTime   @updatedAt
   admin              Admin?
   doctor             Doctor?
-  Patient            Patient?
+  patient            Patient?
 
   @@map("users")
 }
