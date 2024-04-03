@@ -4,7 +4,7 @@ import { userFilterableFields } from "./user.constants";
 import pick from "../../../shared/pick";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
-import { Request } from "express";
+import { Request, request } from "express";
 import { JwtPayload } from "jsonwebtoken";
 
 
@@ -94,6 +94,23 @@ const getMyProfile = catchAsync(async (req: Request & { user?:JwtPayload }, res)
 
 
 
+// update my profile 
+const updateMyProfile = catchAsync(async (req: Request & { user?: JwtPayload }, res) => {
+
+  const user = req.user;
+
+  const result = await userServices.updateMyProfile(user as JwtPayload, req.body);
+
+  sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My profile updated!",
+      data: result
+  })
+});
+
+
+
 
 export const userControllers = {
   createAdmin,
@@ -101,5 +118,6 @@ export const userControllers = {
   createPatient,
   getAllUsers,
   changeProfileStatus,
-  getMyProfile
+  getMyProfile,
+  updateMyProfile
 };

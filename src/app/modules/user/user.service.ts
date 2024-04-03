@@ -245,6 +245,49 @@ const getMyProfile = async (user: JwtPayload) => {
 
 
 
+// update my profile 
+const updateMyProfile = async (user:JwtPayload, payload)=>{
+
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user?.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  let profileInfo;
+
+  if (
+    userInfo.role === UserRole.SUPER_ADMIN ||
+    userInfo.role === UserRole.ADMIN
+  ) {
+    profileInfo = await prisma.admin.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: payload,
+    });
+  } else if (userInfo.role === UserRole.DOCTOR) {
+    profileInfo = await prisma.doctor.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: payload,
+    });
+  } else if (userInfo.role === UserRole.PATIENT) {
+    profileInfo = await prisma.patient.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: payload,
+    });
+  };
+
+
+  return profileInfo;
+
+}
+
 
 
 
@@ -255,4 +298,5 @@ export const userServices = {
   getAllUsers,
   changeProfileStatus,
   getMyProfile,
+  updateMyProfile
 };
