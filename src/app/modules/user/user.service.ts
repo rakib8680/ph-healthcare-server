@@ -1,4 +1,4 @@
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma, UserRole, UserStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import prisma from "../../../shared/prisma";
 import { uploadToCloudinary } from "../../../helpers/fileUploader";
@@ -6,8 +6,7 @@ import { TFile } from "../../interfaces/file";
 import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { userSearchableFields } from "./user.constants";
-
-
+import { JwtPayload } from "jsonwebtoken";
 
 // create admin into DB
 const createAdminIntoDB = async (req: any) => {
@@ -45,8 +44,6 @@ const createAdminIntoDB = async (req: any) => {
   return createdAdminData;
 };
 
-
-
 // create doctor into DB
 const createDoctorIntoDB = async (req: any) => {
   // upload photo in cloudinary
@@ -82,8 +79,6 @@ const createDoctorIntoDB = async (req: any) => {
 
   return createdDoctorData;
 };
-
-
 
 // create patient into DB
 const createPatientIntoDB = async (req: any) => {
@@ -121,8 +116,6 @@ const createPatientIntoDB = async (req: any) => {
 
   return createdPatientData;
 };
-
-
 
 // get all users from DB
 const getAllUsers = async (params: any, options: TPaginationOptions) => {
@@ -192,24 +185,66 @@ const getAllUsers = async (params: any, options: TPaginationOptions) => {
   };
 };
 
-
-// update user status 
+// update user status
 const changeProfileStatus = async (id: string, status: UserRole) => {
   const userData = await prisma.user.findUniqueOrThrow({
-      where: {
-          id
-      }
+    where: {
+      id,
+    },
   });
 
   const updateUserStatus = await prisma.user.update({
-      where: {
-          id
-      },
-      data: status
+    where: {
+      id,
+    },
+    data: status,
   });
 
   return updateUserStatus;
 };
+
+// get my profile
+const getMyProfile = async (user: JwtPayload) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user?.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  let profileInfo;
+
+  if (
+    userInfo.role === UserRole.SUPER_ADMIN ||
+    userInfo.role === UserRole.ADMIN
+  ) {
+    profileInfo = await prisma.admin.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.DOCTOR) {
+    profileInfo = await prisma.doctor.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.PATIENT) {
+    profileInfo = await prisma.patient.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  }
+
+  // remove password field
+  const { password, ...userData } = userInfo;
+
+  return { ...userData, ...profileInfo };
+};
+
+
+
 
 
 
@@ -218,5 +253,6 @@ export const userServices = {
   createDoctorIntoDB,
   createPatientIntoDB,
   getAllUsers,
-  changeProfileStatus
+  changeProfileStatus,
+  getMyProfile,
 };

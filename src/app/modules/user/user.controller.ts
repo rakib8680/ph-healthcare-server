@@ -4,6 +4,8 @@ import { userFilterableFields } from "./user.constants";
 import pick from "../../../shared/pick";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
+import { Request } from "express";
+import { JwtPayload } from "jsonwebtoken";
 
 
 
@@ -75,6 +77,22 @@ const changeProfileStatus = catchAsync(async (req, res) => {
 
 
 
+// get my profile
+const getMyProfile = catchAsync(async (req: Request & { user?:JwtPayload }, res) => {
+
+  const user = req.user;
+
+  const result = await userServices.getMyProfile(user as JwtPayload);
+
+  sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My profile data fetched!",
+      data: result
+  })
+});
+
+
 
 
 export const userControllers = {
@@ -82,5 +100,6 @@ export const userControllers = {
   createDoctor,
   createPatient,
   getAllUsers,
-  changeProfileStatus
+  changeProfileStatus,
+  getMyProfile
 };

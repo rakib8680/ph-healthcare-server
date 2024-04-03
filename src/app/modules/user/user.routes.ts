@@ -12,10 +12,17 @@ const router = express.Router();
 
 router.get(
   "/",
-  
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   userControllers.getAllUsers
 );
+
+
+// get my profile
+router.get(
+  '/me',
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  userControllers.getMyProfile
+)
 
 
 
