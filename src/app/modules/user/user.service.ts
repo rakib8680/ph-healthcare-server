@@ -1,7 +1,7 @@
 import { Prisma, UserRole, UserStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import prisma from "../../../shared/prisma";
-import { uploadToCloudinary } from "../../../helpers/fileUploader";
+import { upload, uploadToCloudinary } from "../../../helpers/fileUploader";
 import { TFile } from "../../interfaces/file";
 import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
