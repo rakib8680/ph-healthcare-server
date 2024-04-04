@@ -99,7 +99,7 @@ const updateMyProfile = catchAsync(async (req: Request & { user?: JwtPayload }, 
 
   const user = req.user;
 
-  const result = await userServices.updateMyProfile(user as JwtPayload, req.body);
+  const result = await userServices.updateMyProfile(user as JwtPayload, req);
 
   sendResponse(res, {
       statusCode: httpStatus.OK,

@@ -7,6 +7,9 @@ import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { userSearchableFields } from "./user.constants";
 import { JwtPayload } from "jsonwebtoken";
+import { Request } from "express";
+
+
 
 // create admin into DB
 const createAdminIntoDB = async (req: any) => {
@@ -44,6 +47,7 @@ const createAdminIntoDB = async (req: any) => {
   return createdAdminData;
 };
 
+
 // create doctor into DB
 const createDoctorIntoDB = async (req: any) => {
   // upload photo in cloudinary
@@ -79,6 +83,7 @@ const createDoctorIntoDB = async (req: any) => {
 
   return createdDoctorData;
 };
+
 
 // create patient into DB
 const createPatientIntoDB = async (req: any) => {
@@ -116,6 +121,7 @@ const createPatientIntoDB = async (req: any) => {
 
   return createdPatientData;
 };
+
 
 // get all users from DB
 const getAllUsers = async (params: any, options: TPaginationOptions) => {
@@ -185,6 +191,7 @@ const getAllUsers = async (params: any, options: TPaginationOptions) => {
   };
 };
 
+
 // update user status
 const changeProfileStatus = async (id: string, status: UserRole) => {
   const userData = await prisma.user.findUniqueOrThrow({
@@ -202,6 +209,7 @@ const changeProfileStatus = async (id: string, status: UserRole) => {
 
   return updateUserStatus;
 };
+
 
 // get my profile
 const getMyProfile = async (user: JwtPayload) => {
@@ -244,10 +252,17 @@ const getMyProfile = async (user: JwtPayload) => {
 };
 
 
+// update my profile
+const updateMyProfile = async (user: JwtPayload, req: Request) => {
 
-// update my profile 
-const updateMyProfile = async (user:JwtPayload, payload)=>{
+  // upload photo in cloudinary
+  const file = req.file as TFile;
+  if (file) {
+    const uploadedFile = await uploadToCloudinary(file);
+    req.body.profilePhoto = uploadedFile?.secure_url;
+  }
 
+  // check if user exists
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
       email: user?.email,
@@ -265,29 +280,26 @@ const updateMyProfile = async (user:JwtPayload, payload)=>{
       where: {
         email: userInfo.email,
       },
-      data: payload,
+      data: req.body,
     });
   } else if (userInfo.role === UserRole.DOCTOR) {
     profileInfo = await prisma.doctor.update({
       where: {
         email: userInfo.email,
       },
-      data: payload,
+      data: req.body,
     });
   } else if (userInfo.role === UserRole.PATIENT) {
     profileInfo = await prisma.patient.update({
       where: {
         email: userInfo.email,
       },
-      data: payload,
+      data: req.body,
     });
-  };
-
+  }
 
   return profileInfo;
-
-}
-
+};
 
 
 
@@ -298,5 +310,5 @@ export const userServices = {
   getAllUsers,
   changeProfileStatus,
   getMyProfile,
-  updateMyProfile
+  updateMyProfile,
 };
