@@ -14,6 +14,13 @@ router.get('/', DoctorController.getAllFromDB);
 router.get('/:id', DoctorController.getByIdFromDB);
 
 
+router.patch(
+    '/:id',
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR),
+    DoctorController.updateIntoDB
+);
+
+
 router.delete(
     '/:id',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
