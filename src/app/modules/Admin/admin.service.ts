@@ -61,6 +61,7 @@ const getAllAdmins = async (
   });
 
   const total = await prisma.admin.count({ where: whereConditions });
+  
   return {
     meta: {
       page,
