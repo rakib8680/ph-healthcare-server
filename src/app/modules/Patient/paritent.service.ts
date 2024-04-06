@@ -92,6 +92,64 @@ const getByIdFromDB = async (id: string): Promise<Patient | null> => {
 
 
 
+const updateIntoDB = async (id: string, payload: any) => {
+  const { patientHealthData, medicalReport, ...patientData } = payload;
+
+  const patientInfo = await prisma.patient.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+
+  const result = await prisma.$transaction(async (tx) => {
+
+    // update patient data
+    const updatedPatient = await prisma.patient.update({
+      where: {
+        id,
+      },
+      data: patientData,
+      include: {
+        patientHealthData: true,
+        medicalReport: true,
+      },
+    });
+
+
+    // create or update patient health data
+    if (patientHealthData) {
+      const healthData = await tx.patientHealthData.upsert({
+        where: {
+          patientId: patientInfo.id,
+        },
+        update: patientHealthData,
+        create: { ...patientHealthData, patientId: patientInfo.id },
+      });
+    }
+
+    if (medicalReport) {
+      const report = await tx.medicalReport.create({
+        data: { ...medicalReport, patientId: patientInfo.id },
+      });
+    }
+  });
+
+  const responseData = await prisma.patient.findUniqueOrThrow({
+    where: {
+      id: patientInfo.id,
+    },
+    include: {
+      patientHealthData: true,
+      medicalReport: true,
+    },
+  });
+
+  return responseData;
+};
+
+
+
 const deleteFromDB = async (id: string): Promise<Patient | null> => {
   const result = await prisma.$transaction(async (tx) => {
     // delete medical report
@@ -129,8 +187,9 @@ const deleteFromDB = async (id: string): Promise<Patient | null> => {
 };
 
 
+
 const softDelete = async (id: string): Promise<Patient | null> => {
-  return await prisma.$transaction(async transactionClient => {
+  return await prisma.$transaction(async (transactionClient) => {
     const deletedPatient = await transactionClient.patient.update({
       where: { id },
       data: {
@@ -151,9 +210,12 @@ const softDelete = async (id: string): Promise<Patient | null> => {
   });
 };
 
+
+
 export const PatientService = {
   getAllFromDB,
   getByIdFromDB,
   deleteFromDB,
   softDelete,
+  updateIntoDB,
 };

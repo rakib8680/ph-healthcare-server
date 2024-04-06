@@ -38,6 +38,21 @@ const getByIdFromDB = catchAsync(async (req, res) => {
 
 
 
+const updateIntoDB = catchAsync(async (req, res) => {
+
+    const id = req.params.id;
+  const result = await PatientService.updateIntoDB(id,req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Patient updated successfully",
+    data: result,
+  });
+});
+
+
+
 const deleteFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await PatientService.deleteFromDB(id);
@@ -69,4 +84,5 @@ export const PatientController = {
   getByIdFromDB,
   deleteFromDB,
   softDelete,
+  updateIntoDB,
 };
