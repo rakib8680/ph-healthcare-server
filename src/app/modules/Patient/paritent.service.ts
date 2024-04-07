@@ -2,7 +2,7 @@ import { Patient, Prisma, UserStatus } from "@prisma/client";
 import prisma from "../../../shared/prisma";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { patientSearchableFields } from "./partient.constants";
-import { TPatientFilterRequest } from "./patient.interface";
+import { TPatientFilterRequest, TPatientUpdate } from "./patient.interface";
 import { TPaginationOptions } from "../../interfaces/pagination";
 
 
@@ -92,20 +92,21 @@ const getByIdFromDB = async (id: string): Promise<Patient | null> => {
 
 
 
-const updateIntoDB = async (id: string, payload: any) => {
+const updateIntoDB = async (id: string, payload: Partial<TPatientUpdate>) :Promise<Patient | null > => {
   const { patientHealthData, medicalReport, ...patientData } = payload;
 
   const patientInfo = await prisma.patient.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
 
-  const result = await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
 
     // update patient data
-    const updatedPatient = await prisma.patient.update({
+     await prisma.patient.update({
       where: {
         id,
       },
@@ -119,7 +120,7 @@ const updateIntoDB = async (id: string, payload: any) => {
 
     // create or update patient health data
     if (patientHealthData) {
-      const healthData = await tx.patientHealthData.upsert({
+       await tx.patientHealthData.upsert({
         where: {
           patientId: patientInfo.id,
         },
@@ -129,7 +130,7 @@ const updateIntoDB = async (id: string, payload: any) => {
     }
 
     if (medicalReport) {
-      const report = await tx.medicalReport.create({
+       await tx.medicalReport.create({
         data: { ...medicalReport, patientId: patientInfo.id },
       });
     }
