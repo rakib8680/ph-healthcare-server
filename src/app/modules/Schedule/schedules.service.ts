@@ -102,22 +102,22 @@ const convertDateTime = async (date: Date) => {
     const andConditions = [];
   
     // Adding date filtering conditions if startDate and endDate are provided
-    // if (startDate && endDate) {
-    //   andConditions.push({
-    //     AND: [
-    //       {
-    //         startDate: {
-    //           gte: startDate, // Greater than or equal to startDate
-    //         },
-    //       },
-    //       {
-    //         endDate: {
-    //           lte: endDate, // Less than or equal to endDate
-    //         },
-    //       },
-    //     ],
-    //   });
-    // }
+    if (startDate && endDate) {
+      andConditions.push({
+        AND: [
+          {
+            startDate: {
+              gte: startDate, // Greater than or equal to startDate
+            },
+          },
+          {
+            endDate: {
+              lte: endDate, // Less than or equal to endDate
+            },
+          },
+        ],
+      });
+    }
   
     if (Object.keys(filterData).length > 0) {
       andConditions.push({
@@ -135,6 +135,7 @@ const convertDateTime = async (date: Date) => {
       andConditions.length > 0 ? { AND: andConditions } : {};
   
   
+      // find all schedules that a doctor has already scheduled
     const doctorsSchedules = await prisma.doctorSchedules.findMany({
       where: {
         doctor: {
@@ -143,13 +144,13 @@ const convertDateTime = async (date: Date) => {
       }
     });
   
-    // const doctorScheduleIds = new Set(doctorsSchedules.map(schedule => schedule.scheduleId));
+    const doctorScheduleIds = new Set(doctorsSchedules.map(schedule => schedule.scheduleId));
   
     const result = await prisma.schedule.findMany({
       where: {
         ...whereConditions,
         id: {
-          // notIn: [...doctorScheduleIds]
+          notIn: [...doctorScheduleIds]
         }
       },
       skip,
@@ -165,7 +166,7 @@ const convertDateTime = async (date: Date) => {
       where: {
         ...whereConditions,
         id: {
-          // notIn: [...doctorScheduleIds]
+          notIn: [...doctorScheduleIds]
         }
       }
     });
