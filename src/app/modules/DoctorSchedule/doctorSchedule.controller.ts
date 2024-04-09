@@ -8,6 +8,7 @@ import catchAsync from '../../../shared/catchAsync';
 import { DoctorScheduleService } from './doctorSchedule.service';
 import pick from '../../../shared/pick';
 import { scheduleFilterableFields } from '../Schedule/schedule.constants';
+import { JwtPayload } from 'jsonwebtoken';
 
 
 const insertIntoDB = catchAsync(async (req: Request & {user?:any}, res) => {
@@ -41,7 +42,24 @@ const getMySchedules = catchAsync(async (req: Request & {user?:any} , res) => {
 
 
 
+
+const deleteFromDB = catchAsync(async (req: Request & { user?:JwtPayload }, res: Response) => {
+
+  const user = req.user;
+  const { id } = req.params;
+  const result = await DoctorScheduleService.deleteFromDB(user as JwtPayload, id);
+
+  sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My Schedule deleted successfully!",
+      data: result
+  });
+});
+
+
 export const DoctorScheduleController = {
     insertIntoDB,
-    getMySchedules
+    getMySchedules,
+    deleteFromDB
   };
