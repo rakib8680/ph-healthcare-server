@@ -12,7 +12,7 @@ import { TPaginationOptions } from '../../interfaces/pagination';
 const convertDateTime = async (date: Date) => {
     const offset = date.getTimezoneOffset() * 60000;
     return new Date(date.getTime() + offset);
-  }
+};
 
 
 
@@ -85,7 +85,6 @@ const convertDateTime = async (date: Date) => {
   
     return schedules;
   };
-
 
 
 
@@ -183,8 +182,31 @@ const convertDateTime = async (date: Date) => {
 
 
 
+  const getByIdFromDB = async (id: string): Promise<Schedule | null> => {
+    const result = await prisma.schedule.findUnique({
+        where: {
+            id,
+        },
+    });
+    //console.log(result?.startDateTime.getHours() + ":" + result?.startDateTime.getMinutes())
+    return result;
+};
+
+
+const deleteFromDB = async (id: string): Promise<Schedule> => {
+    const result = await prisma.schedule.delete({
+        where: {
+            id,
+        },
+    });
+    return result;
+};
+
+
 
 export const ScheduleService = {
     insertIntoDB,
-    getAllFromDB
+    getAllFromDB,
+    getByIdFromDB,
+    deleteFromDB
 }
