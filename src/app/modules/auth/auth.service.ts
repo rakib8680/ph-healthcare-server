@@ -12,6 +12,7 @@ import { sendMail } from "./emailSender";
 
 // Login User
 const loginUser = async (payload: { email: string; password: string }) => {
+
   // check if user exists
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
