@@ -1,7 +1,6 @@
 {
   "name": "ph-healthcare-server",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -39,5 +38,7 @@
     "nodemailer": "^6.9.13",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }
