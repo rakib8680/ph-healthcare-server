@@ -10,7 +10,7 @@ const router = express.Router();
 router.get(
     '/',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-    // AppointmentController.getAllFromDB
+    AppointmentController.getAllFromDB
 );
 
 
@@ -20,6 +20,8 @@ router.get(
     auth(UserRole.PATIENT, UserRole.DOCTOR),
     AppointmentController.getMyAppointment
 )
+
+
 
 
 
