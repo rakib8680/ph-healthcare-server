@@ -23,13 +23,22 @@ router.get(
 
 
 
-
-
 router.post(
     '/',
     auth(UserRole.PATIENT),
     AppointmentController.createAppointment
 );
+
+
+
+
+router.patch(
+    '/status/:id',
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR),
+    AppointmentController.changeAppointmentStatus
+);
+
+
 
 
 

@@ -19,6 +19,8 @@ const auth = (...roles: string[]) => {
     // verify the token
     const decodedData = verifyToken(token, config.jwtAccessSecret as Secret);
 
+
+
     if (roles.length && !roles.includes(decodedData.role)) {
       throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized");
     }
