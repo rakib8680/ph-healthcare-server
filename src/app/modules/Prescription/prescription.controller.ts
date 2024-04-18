@@ -5,6 +5,7 @@ import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import { PrescriptionService } from './prescription.service';
 import pick from '../../../shared/pick';
+import { prescriptionFilterableFields } from './prescription.constants';
 
 
 // create a prescription 
@@ -38,8 +39,26 @@ const patientPrescription = catchAsync(async (req: Request & { user?: JwtPayload
 
 
 
+// get all prescription
+const getAllFromDB = catchAsync(async (req, res) => {
+    const filters = pick(req.query, prescriptionFilterableFields);
+    const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    const result = await PrescriptionService.getAllFromDB(filters, options);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Prescriptions retrieval successfully',
+        meta: result.meta,
+        data: result.data,
+    });
+});
+
+
+
+
 
 export const PrescriptionController = {
     insertIntoDB,
-    patientPrescription
+    patientPrescription,
+    getAllFromDB
 };
