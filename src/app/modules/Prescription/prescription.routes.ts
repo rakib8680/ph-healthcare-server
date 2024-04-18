@@ -12,11 +12,11 @@ const router = express.Router();
 //     PrescriptionController.getAllFromDB
 // );
 
-// router.get(
-//     '/my-prescription',
-//     auth(UserRole.PATIENT),
-//     PrescriptionController.patientPrescription
-// )
+router.get(
+    '/my-prescription',
+    auth(UserRole.PATIENT),
+    PrescriptionController.patientPrescription
+)
 
 router.post(
     '/',
