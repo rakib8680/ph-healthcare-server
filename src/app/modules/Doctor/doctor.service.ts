@@ -76,7 +76,7 @@ const getAllFromDB = async (
             [options.sortBy]: options.sortOrder,
           }
         : {
-            createdAt: "desc",
+            averageRating: "desc",
           },
   });
 
