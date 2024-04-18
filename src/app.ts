@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 
-
+// cancel unpaid appointments
 cron.schedule("* * * * *", () => {
   try {
     AppointmentService.cancelUnpaidAppointments();

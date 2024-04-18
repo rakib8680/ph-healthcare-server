@@ -12,6 +12,9 @@ import {
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
 
+
+
+
 // create an appointment
 const createAppointment = async (user: JwtPayload, payload: any) => {
   // get patient and doctor data from the database
@@ -99,6 +102,8 @@ const createAppointment = async (user: JwtPayload, payload: any) => {
   return result;
 };
 
+
+
 // get my appointments
 const getMyAppointment = async (
   user: JwtPayload,
@@ -169,6 +174,8 @@ const getMyAppointment = async (
   };
 };
 
+
+
 // get all appointments
 const getAllFromDB = async (filters: any, options: TPaginationOptions) => {
   const { limit, page, skip } = calculatePagination(options);
@@ -233,6 +240,8 @@ const getAllFromDB = async (filters: any, options: TPaginationOptions) => {
   };
 };
 
+
+
 // change appointment status
 const changeAppointmentStatus = async (
   appointmentId: string,
@@ -270,6 +279,8 @@ const changeAppointmentStatus = async (
   return result;
 };
 
+
+// cancel unpaid appointments
 const cancelUnpaidAppointments = async () => {
   const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000);
 
@@ -318,6 +329,8 @@ const cancelUnpaidAppointments = async () => {
     // console.log("updated");
   });
 };
+
+
 
 export const AppointmentService = {
   createAppointment,
