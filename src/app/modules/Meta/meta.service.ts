@@ -15,7 +15,7 @@ const fetchDashboardMetaData = async (user: JwtPayload) => {
       getAdminMetaData();
       break;
     case UserRole.DOCTOR:
-      getDoctorMetaData();
+      getDoctorMetaData(user);
       break;
     case UserRole.PATIENT:
       getPatientMetaData();
@@ -28,11 +28,12 @@ const fetchDashboardMetaData = async (user: JwtPayload) => {
   }
 };
 
+// super admin metadata
 const getSuperAdminMetaData = async () => {
 };
 
 
-
+// admin metadata
 const getAdminMetaData = async () => {
 
     const appointmentCount = await prisma.appointment.count();
@@ -53,15 +54,48 @@ const getAdminMetaData = async () => {
 
 
 
+// doctor metadata
+const getDoctorMetaData = async (user : JwtPayload) => {
 
 
-const getDoctorMetaData = async () => {
-    console.log('Doctor Meta Data');
+    const doctorData = await prisma.doctor.findUniqueOrThrow({
+        where: {
+            email: user?.email
+        }
+    });
+
+    const appointmentCount = await prisma.appointment.count({
+        where: {
+            doctorId: doctorData.id
+        }
+    });
+
+
+    const patientCount = await prisma.appointment.groupBy({
+        by: ['patientId'],
+        _count:{
+            id:true
+        }
+    });
+
+
+
+    console.log(patientCount);
 };
 
+
+
+
+
+// patient metadata
 const getPatientMetaData = async () => {
     console.log('Patient Meta Data');
 };
+
+
+
+
+
 
 export const MetaService = {
   fetchDashboardMetaData,
