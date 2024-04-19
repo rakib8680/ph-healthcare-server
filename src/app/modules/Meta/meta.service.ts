@@ -3,24 +3,25 @@ import { JwtPayload } from "jsonwebtoken";
 import ApiError from "../../errors/ApiError";
 import prisma from "../../../shared/prisma";
 
+
+
+
 const fetchDashboardMetaData = async (user: JwtPayload) => {
-
   let metaData;
-
 
   // check the user role and call the appropriate function
   switch (user.role) {
     case UserRole.SUPER_ADMIN:
-     metaData = getSuperAdminMetaData();
+      metaData = getSuperAdminMetaData();
       break;
     case UserRole.ADMIN:
-      metaData =  getAdminMetaData();
+      metaData = getAdminMetaData();
       break;
     case UserRole.DOCTOR:
-      metaData =  getDoctorMetaData(user);
+      metaData = getDoctorMetaData(user);
       break;
     case UserRole.PATIENT:
-      metaData =  getPatientMetaData(user);
+      metaData = getPatientMetaData(user);
       break;
     default:
       throw new ApiError(
@@ -32,6 +33,40 @@ const fetchDashboardMetaData = async (user: JwtPayload) => {
   return metaData;
 };
 
+
+
+
+const getBarChartData = async () => {
+  const appointmentCountByMonth: { month: Date; count: bigint }[] =
+    await prisma.$queryRaw`
+
+    select date_trunc('month',"createdAt")as month,
+    cast(count(*) as integer)as count from  "appointments"
+    group by month
+    order by month asc 
+
+  `;
+  return appointmentCountByMonth;
+};
+
+const getPieChartData = async () => {
+  const appointmentStatusDistribution = await prisma.appointment.groupBy({
+    by: ["status"],
+    _count: { id: true },
+  });
+
+  const formattedAppointmentStatusDistribution =
+    appointmentStatusDistribution.map(({ status, _count }) => ({
+      status,
+      count: Number(_count.id),
+    }));
+
+  return formattedAppointmentStatusDistribution;
+};
+
+
+
+
 // super admin metadata
 const getSuperAdminMetaData = async () => {
   const appointmentCount = await prisma.appointment.count();
@@ -39,6 +74,9 @@ const getSuperAdminMetaData = async () => {
   const doctorCount = await prisma.doctor.count();
   const adminCount = await prisma.admin.count();
   const paymentCount = await prisma.payment.count();
+
+  const barCartData = await getBarChartData();
+  const pieChartData = await getPieChartData();
 
   const totalRevenue = await prisma.payment.aggregate({
     _sum: { amount: true },
@@ -54,8 +92,12 @@ const getSuperAdminMetaData = async () => {
     adminCount,
     paymentCount,
     totalRevenue,
+    barCartData,
+    pieChartData,
   };
 };
+
+
 
 // admin metadata
 const getAdminMetaData = async () => {
@@ -63,6 +105,9 @@ const getAdminMetaData = async () => {
   const patientCount = await prisma.patient.count();
   const doctorCount = await prisma.doctor.count();
   const paymentCount = await prisma.payment.count();
+
+  const barCartData = await getBarChartData();
+  const pieChartData = await getPieChartData();
 
   const totalRevenue = await prisma.payment.aggregate({
     _sum: { amount: true },
@@ -77,8 +122,12 @@ const getAdminMetaData = async () => {
     doctorCount,
     paymentCount,
     totalRevenue,
+    barCartData,
+    pieChartData,
   };
 };
+
+
 
 // doctor metadata
 const getDoctorMetaData = async (user: JwtPayload) => {
@@ -133,15 +182,16 @@ const getDoctorMetaData = async (user: JwtPayload) => {
       count: Number(_count.id),
     }));
 
-
-    return {
-      appointmentCount,
-      reviewCount,
-      patientCount: patientCount.length,
-      totalRevenue,
-      formattedAppointmentStatusDistribution
-  }
+  return {
+    appointmentCount,
+    reviewCount,
+    patientCount: patientCount.length,
+    totalRevenue,
+    formattedAppointmentStatusDistribution,
+  };
 };
+
+
 
 // patient metadata
 const getPatientMetaData = async (user: JwtPayload) => {
@@ -190,6 +240,9 @@ const getPatientMetaData = async (user: JwtPayload) => {
     formattedAppointmentStatusDistribution,
   };
 };
+
+
+
 
 export const MetaService = {
   fetchDashboardMetaData,
