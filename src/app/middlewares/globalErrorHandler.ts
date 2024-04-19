@@ -26,7 +26,7 @@ const globalErrorHandler = (
     }
   }
 
-  res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+  res.status(statusCode).json({
     success,
     message,
     error,
